@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Library Catalog</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eef1f5;
+      margin: 0;
+      padding: 30px;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #2c3e50;
+    }
+
+    table {
+      width: 90%;
+      margin: 20px auto;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+      padding: 14px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+
+    th {
+      background-color: #34495e;
+      color: #fff;
+    }
+
+    tr:nth-child(odd) {
+      background-color: #f2f2f2;
+    }
+
+    form {
+      background-color: #fff;
+      padding: 25px;
+      margin: 30px auto;
+      width: 85%;
+      max-width: 600px;
+      border-radius: 10px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 12px;
+      font-weight: bold;
+    }
+
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      margin-bottom: 18px;
+      border: 1px solid #bbb;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 12px 18px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+  <h1>Library Catalog</h1>
+
+  <table id="catalog">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Genre</th>
+        <th>Author</th>
+        <th>Year</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h2>Add a New Book</h2>
+  <form id="addForm">
+    <label>Title: <input type="text" id="newTitle" required></label>
+    <label>Genre: <input type="text" id="newGenre" required></label>
+    <label>Author: <input type="text" id="newAuthor" required></label>
+    <label>Year: <input type="number" id="newYear" required></label>
+    <button type="submit">Add Book</button>
+  </form>
+
+  <h2>Edit Book Details</h2>
+  <form id="editForm">
+    <label>Current Title: <input type="text" id="currentTitle" required></label>
+    <label>New Title: <input type="text" id="bookTitle" required></label>
+    <label>Genre Type: <input type="text" id="bookGenre" required></label>
+    <label>Author Name: <input type="text" id="bookAuthor" required></label>
+    <label>Publication Year: <input type="number" id="bookYear" required></label>
+    <button type="submit">Save Changes</button>
+  </form>
+
+  <h2>Delete a Book</h2>
+  <form id="deleteForm">
+    <label>Title of Book to Delete: <input type="text" id="deleteTitle" required></label>
+    <button type="submit">Delete Book</button>
+  </form>
+
+  <script>
+    const bookList = [
+      { title: "A Game of Thrones", genre: "Fantasy", author: "George R.R. Martin", year: 1996 },
+      { title: "The Name of the Wind", genre: "Fantasy", author: "Patrick Rothfuss", year: 2007 },
+      { title: "Ender's Game", genre: "Science Fiction", author: "Orson Scott Card", year: 1985 }
+    ];
+
+    function renderCatalog() {
+      const tableBody = document.querySelector("#catalog tbody");
+      tableBody.innerHTML = "";
+      bookList.forEach(book => {
+        const rowHTML = `<tr><td>${book.title}</td><td>${book.genre}</td><td>${book.author}</td><td>${book.year}</td></tr>`;
+        tableBody.insertAdjacentHTML("beforeend", rowHTML);
+      });
+    }
+
+    document.getElementById("addForm").addEventListener("submit", function (event) {
+      event.preventDefault();
+      const title = document.getElementById("newTitle").value.trim();
+      const genre = document.getElementById("newGenre").value.trim();
+      const author = document.getElementById("newAuthor").value.trim();
+      const year = parseInt(document.getElementById("newYear").value);
+
+      if (!title || !genre || !author || isNaN(year)) {
+        alert("All fields must be completed, and year must be a valid number.");
+        return;
+      }
+
+      if (bookList.some(b => b.title.toLowerCase() === title.toLowerCase())) {
+        alert("Book already exists.");
+        return;
+      }
+
+      bookList.push({ title, genre, author, year });
+      renderCatalog();
+      event.target.reset();
+    });
+
+    document.getElementById("editForm").addEventListener("submit", function (event) {
+      event.preventDefault();
+      const currentTitle = document.getElementById("currentTitle").value.trim();
+      const newTitle = document.getElementById("bookTitle").value.trim();
+      const genre = document.getElementById("bookGenre").value.trim();
+      const author = document.getElementById("bookAuthor").value.trim();
+      const year = parseInt(document.getElementById("bookYear").value);
+
+      if (!currentTitle || !newTitle || !genre || !author || isNaN(year)) {
+        alert("Please fill out all fields correctly.");
+        return;
+      }
+
+      const book = bookList.find(b => b.title.toLowerCase() === currentTitle.toLowerCase());
+      if (!book) {
+        alert("Book not found in the catalog.");
+        return;
+      }
+
+      book.title = newTitle;
+      book.genre = genre;
+      book.author = author;
+      book.year = year;
+      renderCatalog();
+      alert("Book updated successfully.");
+    });
+
+    document.getElementById("deleteForm").addEventListener("submit", function (event) {
+      event.preventDefault();
+      const titleToDelete = document.getElementById("deleteTitle").value.trim();
+      const index = bookList.findIndex(b => b.title.toLowerCase() === titleToDelete.toLowerCase());
+      if (index !== -1) {
+        bookList.splice(index, 1);
+        renderCatalog();
+        alert("Book removed from catalog.");
+      } else {
+        alert("Book not found.");
+      }
+    });
+
+    renderCatalog();
+  </script>
+</body>
+</html>
